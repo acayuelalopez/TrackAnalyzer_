@@ -61,7 +61,7 @@ The ***SPTAnalyzer*** plugin may be installed in Fiji or ImageJ by following the
 
 **1.** In the event of not having ImageJ or Fiji already installed, please navigate through [https://imagej.nih.gov/ij/download.html](https://imagej.nih.gov/ij/download.html), download it and then, install it on a computer with Java pre-installed in either Windows, Mac OS or Linux systems.
 
-**2.**  Once done, download the plugin JAR file named as [SPTAnalyzer_.jar](https://github.com/QuantitativeImageAnalysisUnitCNB/CellTypeAnalyzer/blob/master/CellTypeAnalyzer_.jar) from repository.
+**2.**  Once done, download the plugin JAR file named as [SPTAnalyzer_.jar](https://github.com/QuantitativeImageAnalysisUnitCNB/SPTAnalyzer_/blob/master/SPTAnalyzer_.jar) from repository.
 
 **3.**  Move this file into the `ImageJ/Fiji "plugins" subfolder`, or by dragging and dropping into the `ImageJ/Fiji main window` or optionally, running through menu bar `"Plugins"` **→** `"Install"` **→**  `‘Path to File’`. After installing the plugin, ImageJ or Fiji must be restarted.
 
