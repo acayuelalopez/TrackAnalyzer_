@@ -6,7 +6,7 @@
 - [References](#references)
 
 
-# Cell-TypeAnalyzer
+# SPTAnalyzer
 <!-- toc -->
 
 <a name="general"></a>
