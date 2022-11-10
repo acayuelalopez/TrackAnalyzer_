@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -117,7 +118,7 @@ public class ComputeMSD {
 		// int counter = 0;
 
 		for (int i = 0; i < imported2SpotX.size(); i++) {
-		
+
 			XYSeriesCollection datasetMSS = new XYSeriesCollection();
 			// counter++;
 			double frameInterval = imported2SpotT.get(i).get(2) - imported2SpotT.get(i).get(1);
@@ -145,202 +146,121 @@ public class ComputeMSD {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////scaled
 
-//			double[] msd = new double[imported2Spot.get(i).size()];
-//			int N = 0;
-//			double msdd = 0;
-//			for (int dt = 1; dt < imported2Spot.get(i).size(); dt++) {
-//				msd[dt] = 0d;
-//				for (int j = 1; j <= dt; j++) {
-//					msd[dt] += Math.pow(
-//							(Math.abs(imported2Spot.get(i).get(j).getFeature(Spot.POSITION_X).doubleValue()
-//									- imported2Spot.get(i).get(dt + j).getFeature(Spot.POSITION_X).doubleValue()) * sx),
-//							2)
-//							+ Math.pow((Math.abs(imported2Spot.get(i).get(j).getFeature(Spot.POSITION_Y).doubleValue()
-//									- imported2Spot.get(i).get(dt + j).getFeature(Spot.POSITION_Y).doubleValue()) * sy),
-//									2)
-//							+ Math.pow((Math.abs(imported2Spot.get(i).get(j).getFeature(Spot.POSITION_Z).doubleValue()
-//									- imported2Spot.get(i).get(dt + j).getFeature(Spot.POSITION_Z).doubleValue()) * sz),
-//									2);
-//
-//					msdd = msdd
-//							+ Math.pow((Math.abs(imported2Spot.get(i).get(j).getFeature(Spot.POSITION_X).doubleValue()
-//									- imported2Spot.get(i).get(dt + j).getFeature(Spot.POSITION_X).doubleValue()) * sx),
-//									2)
-//							+ Math.pow((Math.abs(imported2Spot.get(i).get(j).getFeature(Spot.POSITION_Y).doubleValue()
-//									- imported2Spot.get(i).get(dt + j).getFeature(Spot.POSITION_Y).doubleValue()) * sy),
-//									2)
-//							+ Math.pow((Math.abs(imported2Spot.get(i).get(j).getFeature(Spot.POSITION_Z).doubleValue()
-//									- imported2Spot.get(i).get(dt + j).getFeature(Spot.POSITION_Z).doubleValue()) * sz),
-//									2);
-//
-//				}
-//
-//				N++;
-//				msd[dt] /= dt;
-//				timeArray[dt] = dt * SPTBatch_.fps;
-//
-//			}
-//			msdd = msdd / N;
 			int nMSD = imported2SpotX.get(i).size();
-			double[] timeAlpha = new double[nMSD];
-			double[] dt_n = new double[nMSD];
-			double[][] msd = new double[nMSD][2];
-//			double[] dt_n14 = new double[nMSD];
-			ArrayList<Double> msd14_0 = new ArrayList<Double>();
-			ArrayList<Double> msd14_1 = new ArrayList<Double>();
-			ArrayList<Double> msd14_2 = new ArrayList<Double>();
-			ArrayList<Double> dt_n14 = new ArrayList<Double>();
-//			double[][] msd14 = new double[nMSD][2];
-			double N = 0;
-			double msd14 = 0;
+			double[] msdArray = new double[nMSD];
+			double[] timeArray = new double[nMSD];
+			int[] tau = new int[nMSD];
+			for (int z = 0; z < nMSD - 1 + 1; z++)
+				tau[z] = 1 + z;
 
-			for (int dt = 1; dt < nMSD; dt++) {
-				msd[dt][0] = dt * 1;
+			for (int z = 0; z < tau.length; z++)
+				tau[z] = 1 + z;
+			double msd = -1;
+			for (int dt = 0; dt < tau.length; dt++) {
+				double N = 0;
+				msd = 0;
 
-				for (int j = 0; j + dt < imported2SpotX.get(i).size(); j += dt) {
-					msd[dt][1] += Math
-							.pow((imported2SpotX.get(i).get(j).doubleValue()
-									- imported2SpotX.get(i).get(dt + j).doubleValue()), 2)
-							+ Math.pow((imported2SpotY.get(i).get(j).doubleValue()
-									- imported2SpotY.get(i).get(dt + j).doubleValue()), 2);
+				for (int j = tau[dt]; j < imported2SpotX.get(i).size(); j++) {
+					msd = msd
+							+ Math.pow((imported2SpotX.get(i).get(j - tau[dt]).doubleValue()
+									- imported2SpotX.get(i).get(j).doubleValue()), 2)
+							+ Math.pow((imported2SpotY.get(i).get(j - tau[dt]).doubleValue()
+									- imported2SpotY.get(i).get(j).doubleValue()), 2);
 
-					dt_n[dt]++;
+					N++;
 				}
+				msdArray[dt] = msd / N;
+				timeArray[dt] = tau[dt] * frameInterval;
 			}
 			// msd14_1.add((double) 0);
 			/////////////////////////////
-			for (int dt = 1; dt < 5; dt++) {
-				msd14_0.add((double) (dt * 1));
+			int[] tau14 = new int[4];
+			for (int z = 0; z < 4 - 1 + 1; z++)
+				tau14[z] = 1 + z;
 
-				for (int j = 0; j + dt < imported2SpotX.get(i).size(); j += dt) {
+			for (int z = 0; z < tau14.length; z++) {
+				tau14[z] = 1 + z;
+			}
+			double msd14 = -1;
+			SimpleRegression reg = new SimpleRegression(true);
+			for (int dt = 0; dt < tau14.length; dt++) {
+				double N14 = 0;
+				msd14 = 0;
+				for (int j = tau14[dt]; j < imported2SpotX.get(i).size(); j++) {
 					msd14 = msd14
-							+ Math.pow((imported2SpotX.get(i).get(j).doubleValue()
-									- imported2SpotX.get(i).get(dt + j).doubleValue()), 2)
-							+ Math.pow((imported2SpotY.get(i).get(j).doubleValue()
-									- imported2SpotY.get(i).get(dt + j).doubleValue()), 2);
+							+ Math.pow((imported2SpotX.get(i).get(j - tau14[dt]).doubleValue()
+									- imported2SpotX.get(i).get(j).doubleValue()), 2)
+							+ Math.pow((imported2SpotY.get(i).get(j - tau14[dt]).doubleValue()
+									- imported2SpotY.get(i).get(j).doubleValue()), 2);
 
-					msd14_1.add(msd14);
-					N++;
-					dt_n14.add(N);
+					N14++;
+
 				}
+				reg.addData(tau14[dt] * (frameInterval), msd14 / N14);
 			}
 
-			for (int dt = 1; dt < nMSD; dt++)
-				msd[dt][1] = (dt_n[dt] != 0) ? msd[dt][1] / dt_n[dt] : 0;
-			msd14_2.add((double) 0);
-			for (int dt = 1; dt < dt_n14.size(); dt++)
-				msd14_2.add((dt_n14.get(dt) != 0) ? msd14_1.get(dt) / dt_n14.get(dt) : 0);
-			double[] resultmsd = new double[nMSD];
-			double[] resultmsd14 = new double[msd14_2.size()];
-
-			resultmsd[0] = 0;
-			resultmsd14[0] = 0;
-			for (int dt = 1; dt < nMSD; dt++)
-				resultmsd[dt] = msd[dt][1];
-
-			for (int dt = 1; dt < msd14_2.size(); dt++)
-				resultmsd14[dt] = msd14_2.get(dt);
-
+//////one msd/////////////////
 			double sum = 0;
-			for (int dt = 0; dt < resultmsd.length; dt++)
-				sum += resultmsd[dt];
+			for (int z = 0; z < msdArray.length; z++) {
+				if (Double.valueOf(msdArray[z]).isNaN() == Boolean.FALSE) {
+					sum += msdArray[z];
 
-			double msdd = sum / resultmsd.length;
-
-			double[] timeDiff = new double[dt_n14.size()];
-			timeAlpha[0] = 0;
-			for (int dt = 1; dt < dt_n.length; dt++)
-				timeAlpha[dt] = dt * frameInterval;
-			timeDiff[0] = 0;
-			for (int dt = 1; dt < dt_n14.size(); dt++)
-				timeDiff[dt] = dt * frameInterval;
-//
-//			for (int dt = 1; dt < 5; dt++)
-//				msdDiff[dt] = resultmsd[dt];
-
+				}
+			}
+			double msdd = sum / msdArray.length;
 ///////////////////////////////////////////////////////////////// msd per segment/////////////////////
 
-			StraightLineFitModified fdf = new StraightLineFitModified();
-			fdf.doFit(timeAlpha, resultmsd);
 			PowerLawCurveFitModified pwf = new PowerLawCurveFitModified();
-			pwf.doFit(timeAlpha, resultmsd);
-
+			pwf.doFit(timeArray, msdArray);
 			double alphaLong;
 			if (Double.valueOf(pwf.getAlpha()).isNaN() == Boolean.TRUE) {
 				alphaLong = 0;
 			} else {
 				alphaLong = pwf.getAlpha();
 			}
-		
-			double diffusionCoef = fdf.getB() / (4);
-			// IJ.log(pwFit.getAlpha() + "------" + diffusionCoef);
-			alphaToClassifyScaled.add(Double.valueOf(alphaLong));
-			avgScaledInstantDif.add(Double.valueOf(diffusionCoef));
-			avgScaled.add(msdd);
+
+			double diffusionCoef = reg.getSlope() / 4;
+			alphaToClassifyScaled.add(Double.valueOf(Math.abs(alphaLong)));
+			avgScaledInstantDif.add(Double.valueOf(Math.abs(diffusionCoef)));
+			avgScaled.add(Double.valueOf(msdd));
 
 ///////////////////////MSS//////////////////////////
 
 			double[] order = new double[] { 0, 1, 2, 3, 4, 5, 6 };
-
 			double[] scalingCoef = new double[order.length];
 			XYSeriesCollection dataset = new XYSeriesCollection();
 			for (int o = 0; o < order.length; o++) {
 				XYSeries series1 = new XYSeries(o);
-				StraightLineFitModified fdf3 = new StraightLineFitModified();
+				SimpleRegression fdf3 = new SimpleRegression(true);
+				double moments = -1;
+				for (int dt = 0; dt < tau.length; dt++) {
+					double Nmoments = 0;
+					moments = 0;
 
-				int nMoments = imported2SpotX.get(i).size();
-				double[] dt_nMoment = new double[nMoments];
-				double[][] moments = new double[nMoments][2];
+					for (int j = tau[dt]; j < imported2SpotX.get(i).size(); j++) {
+						moments = moments
+								+ Math.pow((imported2SpotX.get(i).get(j - tau[dt]).doubleValue()
+										- imported2SpotX.get(i).get(j).doubleValue()), o)
+								+ Math.pow((imported2SpotY.get(i).get(j - tau[dt]).doubleValue()
+										- imported2SpotY.get(i).get(j).doubleValue()), o);
 
-				for (int dt = 1; dt < nMoments; dt++) {
-
-					moments[dt][0] = dt * 1;
-					for (int j = 0; j + dt < imported2SpotX.get(i).size(); j += dt) {
-						moments[dt][1] += Math
-								.pow((imported2SpotX.get(i).get(j).doubleValue()
-										- imported2SpotX.get(i).get(dt + j).doubleValue()), order[o])
-								+ Math.pow((imported2SpotY.get(i).get(j).doubleValue()
-										- imported2SpotY.get(i).get(dt + j).doubleValue()), order[o]);
-						dt_nMoment[dt]++;
+						Nmoments++;
 					}
-				}
-
-				// }
-
-				for (int dt = 1; dt < nMoments; dt++)
-					moments[dt][1] = (dt_nMoment[dt] != 0) ? moments[dt][1] / dt_nMoment[dt] : 0;
-
-				double[] resultmoments = new double[nMoments];
-				double[] time = new double[nMoments];
-				resultmoments[0] = 0;
-				time[0] = 0;
-				for (int dt = 1; dt < nMoments; dt++) {
-					double value = moments[dt][1];
-					if (value == 0) {
-						resultmoments[dt] = 0.0;
+					double moment = moments / Nmoments;
+					double momentToAdd = -1;
+					if (moment == 0) {
+						momentToAdd = 0.0;
 					} else {
-						//IJ.log(value + "-----" + i + "-------------bueno");
-						resultmoments[dt] = Math.log(Math.abs(value));
+						momentToAdd = Math.log(Math.abs(moment));
 					}
-					//IJ.log(resultmoments[dt] + "-----" + i + "-------------final");
-
+					if (Double.valueOf(momentToAdd).isNaN() == Boolean.FALSE) {
+						series1.add(Math.log((tau[dt] * frameInterval)), momentToAdd);
+						fdf3.addData(Math.log((tau[dt] * frameInterval)), momentToAdd);
+					}
 				}
 
-				for (int dt = 1; dt < nMoments; dt++) {
-//					if (Double.isInfinite(Math.log(resultmoments[dt])) == true) {
-//
-//						sreg.addData(Math.log((dt * frameInterval)), 0.0);
-//						series1.add(Math.log((dt * frameInterval)), 0.0);
-//					} else {
-					// sreg.addData(Math.log((dt * frameInterval)), Math.log(resultmoments[dt]));
-					time[dt] = Math.log((dt * frameInterval));
-					series1.add(Math.log((dt * frameInterval)), resultmoments[dt]);
-					// }
-
-				}
-				fdf3.doFit(time, resultmoments);
 				dataset.addSeries(series1);
-				scalingCoef[o] = fdf3.getB();
+				scalingCoef[o] = fdf3.getSlope();
 
 			}
 
@@ -356,13 +276,13 @@ public class ComputeMSD {
 			} catch (IOException ex) {
 				System.err.println(ex);
 			}
-			StraightLineFitModified fdf2 = new StraightLineFitModified();
+			SimpleRegression fdf2 = new SimpleRegression();
 			XYSeries series2 = new XYSeries(nOfTracks.get(i));
-//			for (int z = 0; z < scalingCoef.size(); z++) {
-//				sreg.addData(z, scalingCoef.get(z));
-//				series2.add(z, scalingCoef.get(z));
-//			}
-			fdf2.doFit(order, scalingCoef);
+			for (int z = 0; z < scalingCoef.length; z++) {
+				fdf2.addData(z, scalingCoef[z]);
+				series2.add(z, scalingCoef[z]);
+			}
+
 			datasetMSS.addSeries(series2);
 			JFreeChart chart2 = ChartFactory.createScatterPlot("MSS γν vs.ν for " + String.valueOf(nOfTracks.get(i)),
 					"γν", "ν", (XYDataset) datasetMSS);
@@ -372,7 +292,7 @@ public class ComputeMSD {
 			} catch (IOException ex) {
 				System.err.println(ex);
 			}
-			double sMss = Math.abs(fdf2.getB());
+			double sMss = Math.abs(fdf2.getSlope());
 			mssValues.add(sMss);
 		}
 ////////////////////////////////////////////////////
