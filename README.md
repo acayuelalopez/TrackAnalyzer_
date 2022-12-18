@@ -13,7 +13,7 @@
 ## General
 > A flexible Fiji/ImageJ plugin to perform SPT analysis, analysis of diffusion, motion classification in batch-mode together with subsequent spot/trajectory 2D visualizaation and filtering.
 <p align="center">
-  <img width="800" height="450" src="https://user-images.githubusercontent.com/83207172/184842269-51ae5422-70aa-470d-b75d-20c32c67e322.png">
+  <img width="800" height="450" src="https://user-images.githubusercontent.com/83207172/208313865-733583bd-864b-404e-82ee-b359d2a8bae6.png">
 </p>
 
 **_Note_:** This plugin (currently) deals with a wide range of file formats supported by Bio-Formats library thus reading almost any image format or multidimensional data as z-stacks, time series, or multiplexed images keeping metadata easily accessible. In case of loading a Leica Image File whose extension is **_.lif_** (storing several image series in the same file), this plugin is capable of extracting each image automatically as a single TIFF file, keeping the original pixel values, spatial and temporal calibration.
@@ -24,13 +24,16 @@
 A high-level overview of the toolbox procedure involved is shown. The processing actions consists of six main stages. First, we describe how to getting started with "SPT-Batch" and second, we provide guidelines for "SPT-Viewer":   
 
 **(Step 1) .** At the beginning, the user must navigate to the appropriate directory where time-lapse files are saved. Also, user must supply the path in which the TrackMate ".XML" configuration file is located. This file contains both the data and parameters needed for tracking analysis in batch-mode thus user must ensure the absolute path provided is correct. Then "TrackAnalyzer" by means of the data-loading tool automatically will scan the selected folders for analysis.
+<p align="center">
+  <img width="900" height="450" src="https://user-images.githubusercontent.com/83207172/208314030-0f67b664-0225-43c4-b8a4-295c8e837fd4.png">
+</p>
 
 **(Step 2) .**  ***Overview of the procedure: SPTBatch.*** Once **"SPTBatch"** button is clicked, a wizard-like GUI will pop up. At first, user has to configure settings to select which data referred to spots, links, tracks or branchs prefers to export as a CSV file. Once all tracks have been read, trajectories will be decompose into "Short" or "Long", those trajectories being above the diffusion coefficient set in "Diff.Threshold" field will be labeled as "Mobile" and below as "Immobile". User can edit the corresponding settings for spot or track visualization. Similarly, whether "Photobleaching step analysis" is selected, the raw intensity profile along the different frames together with their background will be plotted for each trajectory. To measure the background of each spot for each frame in each trajectory, **"TrackAnalyzer"** allows user to accede to several methods (by using "Subtract Background").
 
 In parallel whether the user checks for "Summary Output" and depending on spots, links and tracks chosen, **"TrackAnalyzer"** will generate a summary file pcontaining all values for each movie analyzed. Then if "TraJ: Trajectory Classifier" action is selected, CSV files regarding track characterization and subsequent motion classification will be saved. In case of selection "MSD-MSS plots", the plots of mean squared displacement (MSD) vs. time along with thescaling moments vs. each moment of displacement will be computed.
 Also, if "Tracks to .XML file" is selected, information related to trajectories generated during analysis will be exported as XML file or if "Log to .TXT file" is chosen, useful information about ongoing operations printed in the log window while **"TrackAnalyzer"** runs will be saved. Furthermore, user will be able to export tracks as rois (RoiSet.zip) and corresponding overlays over frames are saved as TIFF file.  Whether "Plots as .PNG file" option is clicked, the user will be allowed to configure X-Y scatter-plots to plot any spot, link or track feature as a function of any other. When selecting "Chemotaxis Analysis Data" action, user will be enabled to plot and export as CSV files including some statistical values characterizing the trajectories form such as the center of mass (CM), forward migration indices (FMI), velocity (V) as well as directness (D). 
 <p align="center">
-  <img width="900" height="450" src="https://user-images.githubusercontent.com/83207172/184845438-7cf72aec-f439-4023-aa15-06223dbc3ad9.png">
+  <img width="900" height="450" src="https://user-images.githubusercontent.com/83207172/208313945-34ac4d0b-970d-4f50-98e0-8ed00e229e8f.png">
 </p>
 
 **(Step 3) .** ***Overview of the procedure: SPTViewer.*** TrackMate benefits from HyperStack Displayer to display tracking results and this isleveraged to perform filtering actions. **"SPT-Viewer"** enables user to keep only those spots or end-trajectories which are relevant under user-defined criteria. Then filtering results can be immediately visualized. 
@@ -42,7 +45,7 @@ Also, if "Tracks to .XML file" is selected, information related to trajectories 
    - **Approach 3 .** This procedure enables user to configure the conditions to identify spot types through scrolling a feature-based histogram above or below a given threshold. Once terms related to spot features are set, they will be grouped into a specific spot type in order to filter out those spots which do not comply with them conversely, identifying those which fulfill them. These spot types relies on an indefinite number of thresholded features.  
 
 <p align="center">
-  <img width="800" height="450" src="https://user-images.githubusercontent.com/83207172/184850773-6c4cdd28-c5ce-4cfe-b3e7-b5eeacf593f6.png">
+  <img width="800" height="450" src="https://user-images.githubusercontent.com/83207172/208314065-fa44424b-53a6-43ae-8f47-61c7984705b1.png">
 </p>
 
  Finally, the user may manage to proceed with the actions to save each post-processed movie as a TIFF file whose overlay shows those relevant spots and tracks kept. Likewise, the user will be enabled to save the post-processed data-table which contains the features computed for each relevant spot or trajectory.
